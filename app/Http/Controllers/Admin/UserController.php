@@ -119,9 +119,9 @@ class UserController extends Controller
      * @param  User $user
      * @return /Illuminate\Http\JsonResponse
      */
-    public function forceDelete(User $user)
+    public function forceDelete($user_id)
     {
-        $this->userservices->forceDeleteUser($user);
+        $this->userservices->forceDeleteUser($user_id);
         return $this->SuccessResponse(null, "user force deleted successfully", 200);
     }
         

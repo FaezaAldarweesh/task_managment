@@ -117,9 +117,7 @@ class UserService {
     public function restoreUser($user_id)
     {
         try {
-            $user = User::findOrFail($user_id);
-            dd($user);
-
+            $user = User::withTrashed()->findOrFail($user_id);
             return $user->restore();
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
@@ -128,14 +126,17 @@ class UserService {
     }
     //========================================================================================================================
 
-    public function forceDeleteUser(User $user)
+    public function forceDeleteUser($user_id)
     {
         try {
+            $user = User::findOrFail($user_id);
+             //منع الأدمن من إزالة حسابه
+             if ($user->role == 'Admin') {
+                throw new \Exception('You cannot delete admin account');
+            }
             return $user->forceDelete();
-        } catch (\Throwable $th) {
-            Log::error($th->getMessage());
-            return $this->errorResponse('Something went wrong with force delete user', 400);
-        }
+        } catch (\Exception $e) { Log::error($e->getMessage()); return $this->errorResponse($e->getMessage(), 400);
+        } catch (\Throwable $th) { Log::error($th->getMessage()); return $this->errorResponse('Something went wrong with deleting user', 400);}
     }
 
 
