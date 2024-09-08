@@ -1,16 +1,9 @@
 <?php
 
-use App\Models\BorrowRecord;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\BookController;
-use App\Http\Controllers\Admin\AdminRatingController;
-use App\Http\Controllers\user\UserRatingController;
-use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\user\UserBorrowRecordController;
-use App\Http\Controllers\Admin\AdminBorrowRecordController;
+use App\Http\Controllers\Admin\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +28,11 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('update_password/{user_id}',[UserController::class ,'update_password']); 
     Route::get('restore_user/{user_id}', [UserController::class, 'restore']);
     Route::delete('forceDelete_user/{user_id}', [UserController::class, 'forceDelete']);
+
+    Route::apiResource('task',TaskController::class);
+    Route::get('restore_task/{task_id}', [TaskController::class, 'restore']);
+    Route::delete('forceDelete_task/{task_id}', [TaskController::class, 'forceDelete']);
+
  
 });
 
