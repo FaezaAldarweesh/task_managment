@@ -7,7 +7,7 @@ use App\Http\Services\UserService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResources;
 use App\Http\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 
@@ -17,22 +17,32 @@ class UserController extends Controller
     use ApiResponseTrait;
     protected $userservices;
     /**
-     * construct to inject User Services 
+     * construct to inject User Services and have middleware to make only user role access to this functions
      * @param UserService $userservices
      */
     public function __construct(UserService $userservices)
     {
+        $this->middleware(['role:Admin', 'permission:All Users'])->only('index');
+        $this->middleware(['role:Admin', 'permission:Add User'])->only('store');
+        $this->middleware(['role:Admin', 'permission:create manager'])->only('create_manager');
+        $this->middleware(['role:Admin', 'permission:View User'])->only('show');
+        $this->middleware(['role:Admin', 'permission:Edit User'])->only('update');
+        $this->middleware(['role:Admin', 'permission:update password'])->only('update_password');
+        $this->middleware(['role:Admin', 'permission:Delete User'])->only('destroy');
+        $this->middleware(['role:Admin', 'permission:restore user'])->only('restore');
+        $this->middleware(['role:Admin', 'permission:forceDelete user'])->only('forceDelete');
         $this->userservices = $userservices;
     }
     //===========================================================================================================================
     /**
      * method to view all user
+     * @param  Request $request
      * @return /Illuminate\Http\JsonResponse
      * من أجل قولبة شكل الاستجابة المعادة UserResources استخدام 
      */
     public function index(Request $request)
     {  
-        $users = $this->userservices->getAllUsers($request);
+        $users = $this->userservices->getAllUsers($request->input('role'));
         return $this->SuccessResponse(UserResources::collection($users), "All Users fetched successfully", 200);
     }
     //===========================================================================================================================
@@ -44,7 +54,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $response = $this->userservices->createEmployee($request->validated());
-        return $this->SuccessResponse(['user Info' => new UserResources($response['user']),'password' => $response['password']], "User created successfully.", 201);
+        return $this->SuccessResponse(['user Info' => new UserResources($response['user']),'password' => $response['password']], "Employee created successfully.", 201);
     }
     //===========================================================================================================================
         /**
@@ -55,7 +65,7 @@ class UserController extends Controller
     public function create_manager(StoreUserRequest $request)
     {
         $response = $this->userservices->createManager($request->validated()); 
-        return $this->SuccessResponse(['user Info' => new UserResources($response['user']),'password' => $response['password']], "User created successfully.", 201);
+        return $this->SuccessResponse(['user Info' => new UserResources($response['user']),'password' => $response['password']], "Manager created successfully.", 201);
     }
     //===========================================================================================================================
     /**
@@ -81,15 +91,14 @@ class UserController extends Controller
     }
     //===========================================================================================================================
         /**
-     * method to update user alraedy exist
-     * @param  UpdateUserRequest $request
-     * @param  User $user
+     * method to update password to user alraedy exist
+     * @param  $user_id
      * @return /Illuminate\Http\JsonResponse
      */
     public function update_password($user_id)
     {
         $updatedUser = $this->userservices->updatePassword($user_id);
-        return $this->SuccessResponse(['user Info' => new UserResources($updatedUser['user']),'password' => $updatedUser['password']], "user updated successfully", 200);
+        return $this->SuccessResponse(['user Info' => new UserResources($updatedUser['user']),'password' => $updatedUser['password']], "password updated successfully", 200);
     }
     //===========================================================================================================================
     /**
@@ -100,12 +109,12 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->userservices->deleteUser($user);
-        return $this->SuccessResponse(null, "user deleted successfully", 200);
+        return $this->SuccessResponse(null, "user soft deleted successfully", 200);
     }
     //========================================================================================================================
     /**
      * method to restore soft delete user alraedy exist
-     * @param  User $user
+     * @param  $user_id
      * @return /Illuminate\Http\JsonResponse
      */
     public function restore($user_id)
@@ -116,7 +125,7 @@ class UserController extends Controller
     //========================================================================================================================
         /**
      * method to force delete user alraedy exist
-     * @param  User $user
+     * @param  $user_id
      * @return /Illuminate\Http\JsonResponse
      */
     public function forceDelete($user_id)

@@ -29,8 +29,8 @@ class StoreTaskRequest extends FormRequest
             'title' => 'required|unique:tasks,title', 
             'description' => 'required|string|min:10|max:150',
             'priority' => 'required|in:High,Medium,Low',
-            'due_date' => 'required|date',
-            'status' => 'nullable|in:Assigned,Received,Done',
+            'due_date' => 'required|date|after_or_equal:today',
+            'status' => 'in:Assigned,Received,Done',
         ];
     }
     //===========================================================================================================================
@@ -75,6 +75,7 @@ class StoreTaskRequest extends FormRequest
             'date' => 'يجب أن يكون الحقل :attribute تاريخاً',
             'priority.in' => 'يجب أن تكون قيمة الحقل إحدى القيم التالية : High,Medium,Low',
             'status.in' => 'يجب أن تكون قيمة الحقل إحدى القيم التالية : Assigned,Recived,Done',
+            'after_or_equal' => 'يجب أن بكون :attribute بتاريخ اليوم و ما بعد',
         ];
     }
 }

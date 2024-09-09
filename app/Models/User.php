@@ -1,22 +1,18 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
-
-    protected $table = 'users';
-    // public $timestamps = true;
-    // public const CREATED_AT = 'created_on';
-    // public const UPDATED_AT = 'updated_on';
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -28,11 +24,6 @@ class User extends Authenticatable implements JWTSubject
         'email',
     ];
 
-    /**
-     * The attributes that are not mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $guarded = [
         'password',
         'role',
@@ -77,16 +68,18 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function scopeFilter(Builder $query, $request){
+    public function scopeFilter(Builder $query, $role){
         //dd($request->role);
-        if(!empty($request->role)){
-            $query->where('role', '=', $request->role);
+        if(!empty($role)){
+            $query->where('role', '=', $role);
         }
         return $query;
     }
+
 
     public function tasks()
     {
        return $this->hasMany(Task::class);
     }
+
 }

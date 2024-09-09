@@ -29,10 +29,16 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('restore_user/{user_id}', [UserController::class, 'restore']);
     Route::delete('forceDelete_user/{user_id}', [UserController::class, 'forceDelete']);
 
+    //inly fro admin + manager
     Route::apiResource('task',TaskController::class);
     Route::get('restore_task/{task_id}', [TaskController::class, 'restore']);
     Route::delete('forceDelete_task/{task_id}', [TaskController::class, 'forceDelete']);
+    
+    //only for admin + manager
+    Route::put('Assign_task/{task_id}', [TaskController::class, 'AssignTask']); 
 
+    //only for admin + employee
+    Route::put('updated_status/{task_id}', [TaskController::class, 'updatedStatus']);
  
 });
 

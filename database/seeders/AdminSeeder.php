@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 
+
 class AdminSeeder extends Seeder
 {
     /**
@@ -21,8 +22,22 @@ class AdminSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin123'),
-            'role' => 'Admin'
+            'role' => 'Admin',
         ]);
+
+        $role = Role::create(['name' => 'Admin']);
+        $permissions = Permission::whereBetween('id', [1,17])->pluck('id')->all();
+        $role->syncPermissions($permissions);
+        $admin->assignRole($role->id);
+
+        $rolemanager = Role::create(['name' => 'manager']);
+        $permissionsmanager = Permission::whereBetween('id', [10,17])->pluck('id')->all();
+        $rolemanager->syncPermissions($permissionsmanager);
+
+
+        $roleemployee = Role::create(['name' => 'employee']);
+        $permissionsemployee = Permission::where('id', 18)->pluck('id')->all();
+        $roleemployee->syncPermissions($permissionsemployee);
 
     }
 }

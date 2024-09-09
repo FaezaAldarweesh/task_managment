@@ -20,8 +20,8 @@ class TaskResources extends JsonResource
         // $password = $password;
         return [
             'task id' => $this->id,
-            'employee name' => $this->user->name,
-            'employee email' => $this->user->email,
+            'employee name' => $this->user->name ?? 'NON',
+            'employee email' => $this->user->email ?? 'NON',
             'task title' => $this->title,
             'task description' => $this->description,
             'task priority' => $this->priority,

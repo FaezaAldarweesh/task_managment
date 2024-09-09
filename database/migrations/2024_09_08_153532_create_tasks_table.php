@@ -19,7 +19,9 @@ return new class extends Migration
             $table->text('description');
             $table->enum('priority',['High','Medium','Low'])->default('Medium');
             $table->date('due_date');
-            $table->enum('status',['Assigned','Received','Done'])->default('Assigned'); 
+            $table->enum('status',['Assigned','Received','Done'])->default('Assigned');  
+            $table->unsignedBigInteger('created_by');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
